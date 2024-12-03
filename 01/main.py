@@ -1,4 +1,5 @@
 import pdb
+from collections import Counter
 
 col1 = []
 col2 = []
@@ -11,10 +12,17 @@ with open('input.txt') as infile:
 
 col1.sort()
 col2.sort()
+count = Counter(col2)
 
 distance = 0
+similarity = 0
 
 for i in range(len(col1)):
-    distance += abs(col1[i] - col2[i])
+    n1 = col1[i]
+    n2 = col2[i]
+    distance += abs(n1 - n2)
 
-print(distance)
+    similarity += (n1 * count[n1])
+
+print(f"distance: {distance}")      # 2815556
+print(f"similarity: {similarity}")  # 23927637
