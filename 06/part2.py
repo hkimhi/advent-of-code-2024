@@ -48,29 +48,35 @@ def move(grid, start_pos, direction):
 
             if (x, y, direction) in visited:
                 # in a loop
-                return True
+                return True, visited
 
             visited.add((x, y, direction))
 
-    return False
+    return False, visited
 
 def test_new_obstruction(grid, start_pos, direction, obstruction_position):
     grid_copy = [row[:] for row in grid]
     x, y = obstruction_position
     grid_copy[x][y] = '#'
-    is_loop = move(grid_copy, start_pos, direction)
+    is_loop, _ = move(grid_copy, start_pos, direction)
     return is_loop
 
 def find_new_obstructions(grid, start_pos, direction):
+    _, visited = move(grid, start_pos, direction)
+    initial_path = set()
+    for (x, y, _) in visited:
+        initial_path.add((x, y))
+    del visited
+
     possible_positions = set()
-    for i in range(len(grid)):
-        for j in range(len(grid[0])):
-            if grid[i][j] == '.' and (i, j) != start_pos:
-                if test_new_obstruction(grid, start_pos, direction, (i, j)):
-                    possible_positions.add((i, j))
+    for (i, j) in initial_path:
+        if grid[i][j] == '.' and (i, j) != start_pos:
+            if test_new_obstruction(grid, start_pos, direction, (i, j)):
+                possible_positions.add((i, j))
     return possible_positions
 
 
 print(f"possible new obstruction positions: {len(find_new_obstructions(grid, start_pos, direction))}")
-# answer is 1480, but the naive solution of checking every single square is quite slow (though it does work)
+# answer is 1480
+# one optimization - only check positions along existing path (from part1)
 
