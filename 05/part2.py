@@ -1,8 +1,13 @@
+import time
+from collections import deque
+
+start_time = time.time()
+
 # key,val pair means for page num KEY, pages in list of val should come after
 page_ordering = {}
 page_updates = []
 
-with open("example.txt") as infile:
+with open("input.txt") as infile:
     is_order = True
     for line in infile.readlines():
         if line == '\n':
@@ -20,17 +25,35 @@ with open("example.txt") as infile:
         else:
             page_updates.append(line)
 
+def topological_sort(update, page_ordering):
+    in_degree = {page: 0 for page in update}
+    for key, v in page_ordering.items():
+        if key in update:
+            for val in v:
+                if val in in_degree:
+                    in_degree[val] += 1
+
+    queue = deque([page for page in update if in_degree[page] == 0])
+    sorted_list = []
+
+    while queue:
+        page = queue.popleft()
+        sorted_list.append(page)
+        for after_page in page_ordering.get(page, []):
+            if after_page in in_degree:
+                in_degree[after_page] -= 1
+                if in_degree[after_page] == 0:
+                    queue.append(after_page)
+
+    return sorted_list
+
 val = 0
 
 for update in page_updates:
     update = [int(_) for _ in update.split(',')]
-    new_update = []
-    good_update = True
-
-    # breakpoint()
-
     idx_map = {page: i for i, page in enumerate(update)}
 
+    good_update = True
     for page in update:
         after_pages = page_ordering.get(page, [])
         for after_page in after_pages:
@@ -42,11 +65,9 @@ for update in page_updates:
             break
 
     if not good_update:
-        # sort based on topological map
-        # TODO learn more about topological map
-        # basic research indicates it is a DFS that ensures dependencies are met (for any edge (u,v), u comes before v)
-        sorted_update = sorted(update, key=lambda page: (idx_map.get(page, float('inf')), page))
-        print(f"old: {update} | new: {sorted_update}")
-        # val += new_update[len(new_update) // 2]
+        sorted_update = topological_sort(update, page_ordering)
+        mid_idx = len(sorted_update) // 2
+        val += sorted_update[mid_idx]
 
-print(f"val: {val}")
+print(f"val: {val}")  # 5466
+print(f"took {time.time() - start_time}s")
