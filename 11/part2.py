@@ -1,5 +1,5 @@
 import time
-from functools import lru_cache
+from functools import cache
 
 start_time = time.time()
 
@@ -8,7 +8,15 @@ with open("input.txt") as infile:
 
 BLINKS = 75
 
-@lru_cache(None)
+# how this works:
+# score returns the "number of stones" that a given (stone, number of blinks) would give
+# it uses memoization with the @cache decorator
+# the recursion makes it really easy, especially with the decorator
+# basically, for any (stone, blinks) pair, if it exists in the cache the function call will be avoided
+# if it doesn't exist in the cache, we actually do the calculation then recurse down
+# this allows for extreme speedup due to the super high frequency of certain (stone, blink) pairs because
+#  the initial list of stones devolves into repeated (stone, blinks) pairs lower down the tree
+@cache
 def score(stone, blinks):
     if blinks == 0:
         return 1
