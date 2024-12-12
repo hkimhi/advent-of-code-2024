@@ -28,6 +28,23 @@ XX
 where X is 'plant_type' and O is 'not plant_type'
 
 diff means 'different'
+
+you only have to check these two scenarios even though there
+are two more scenarios that result in a top-left corner:
+
+XO
+XX
+
+and
+
+XX
+OX
+
+because if you add these two scenarios you will "double count"
+these vertices by triggering a different plant's top-right and bot-right
+respectively. As a result, we can only check the first two scenarios
+(rotated as needed for each corner) for every plant location and
+not double count any vertices
 """
 def check_vertex(x, y, plant_type, vertex_type):
     if vertex_type == "top-left":
@@ -54,6 +71,13 @@ def check_vertex(x, y, plant_type, vertex_type):
         bot_left_diff = x == len(garden) - 1 or y == 0 or garden[x + 1][y - 1] != plant_type
         return (bot_diff and left_diff) or (not bot_diff and not left_diff and bot_left_diff)
 
+"""
+the reason this works is because the number of "sides" (edges) a closed
+shape has is equal to the number of "corners" (vertices). Thus, we can
+count the vertices instead of try and merge the smaller edges from part1,
+thought that is another possible strategy (merge the small edges and look
+for intersections)
+"""
 def dfs(x, y, visited, plant_type):
     stack = [(x, y)]
     area = 0
